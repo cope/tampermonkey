@@ -1,0 +1,83 @@
+// ==UserScript==
+// @name        FB Close Alerts
+// @namespace   CoPe
+// @description Close annoying facebook alerts!
+// @match       *://www.facebook.com/*/allactivity*
+// @version     1
+// @grant       none
+// @require     https://cdnjs.cloudflare.com/ajax/libs/lodash.js/4.17.15/lodash.min.js
+// @require     https://code.jquery.com/jquery-3.4.1.slim.min.js
+// ==/UserScript==
+
+/* globals _, $ */
+
+let __createFBCloseAlertsFrame = () => {
+    let frame = $('<div">FB CLose Alerts<br/><br/></div>');
+    frame.css({
+        position: 'fixed',
+        width: '150px',
+        top: '10px',
+        right: '10px',
+        background: '#76b900',
+        color: '#fff',
+        padding: '10px',
+        'z-index': 1000,
+        'box-shadow': '2px 2px 2px #5e9400'
+    });
+    return frame;
+};
+
+let __createFBCloseAlertsOnButton = () => {
+    let onButton = $('<button">Enable</button>');
+    onButton.css({cursor: 'pointer', float: 'left'});
+    return onButton;
+};
+
+let __createFBCloseAlertsOffButton = () => {
+    let offButton = $('<button">Disable</button>');
+    offButton.css({cursor: 'pointer', float: 'right'});
+    offButton.hide();
+    return offButton;
+};
+
+class FBCloseAlerts {
+    constructor() {
+        this.stop = true;
+
+        this.frame = __createFBCloseAlertsFrame();
+        this.onButton = __createFBCloseAlertsOnButton();
+        this.offButton = __createFBCloseAlertsOffButton();
+
+        this.onButton.click(this.enable.bind(this));
+        this.offButton.click(this.disable.bind(this));
+
+        this.frame.append(this.onButton);
+        this.frame.append(this.offButton);
+        $('body').append(this.frame);
+
+        console.log ("FB Close Alert initiated.");
+        this.zatvori();
+    }
+
+    zatvori() {
+        if(!this.stop) {
+            let zats = document.getElementsByClassName("autofocus layerCancel _4jy0 _4jy3 _4jy1 _51sy selected _42ft");
+            _.each(zats, (zat) => zat.click());
+        }
+        setTimeout(this.zatvori.bind(this), 1000);
+    }
+
+    enable() {
+        this.onButton.hide();
+        this.offButton.show();
+        this.stop = false;
+    }
+
+    disable() {
+        this.offButton.hide();
+        this.onButton.show();
+        this.stop = true;
+    }
+}
+
+new FBCloseAlerts();
