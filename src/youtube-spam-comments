@@ -90,11 +90,11 @@ class YoutubeSpamComments {
 
 	quickScroll() {
 		if (this.keepDeleting) {
-            let main = document.getElementById('main');
-            main.scrollTo(0, main.scrollHeight);
-            setTimeout(() => main.scrollTo(0, main.scrollHeight), 2500);
-            setTimeout(() => main.scrollTo(0, 0), 5000);
-        }
+			let main = document.getElementById('main');
+			main.scrollTo(0, main.scrollHeight);
+			setTimeout(() => main.scrollTo(0, main.scrollHeight), 2500);
+			setTimeout(() => main.scrollTo(0, 0), 5000);
+		}
 	}
 
 	continueDeleting() {
