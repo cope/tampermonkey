@@ -1,0 +1,168 @@
+// ==UserScript==
+// @name        Youtube Spam Comments
+// @namespace   CoPe
+// @description Spam all visible Youtube comments!
+// @match       *://studio.youtube.com/channel/*/comments/*
+// @version     1
+// @grant       none
+// @require     https://cdnjs.cloudflare.com/ajax/libs/lodash.js/4.17.15/lodash.min.js
+// @require     https://code.jquery.com/jquery-3.4.1.slim.min.js
+// ==/UserScript==
+
+/* globals _, $ */
+
+let __createYoutubeSpamCommentsFrame = () => {
+	let frame = $('<div id="_ytspam"">Youtube Spam Comments<br/><br/></div>');
+	frame.css({
+		position: 'fixed',
+		width: '150px',
+		top: '100px',
+		right: '20px',
+		background: '#f00',
+		color: '#fff',
+		padding: '10px',
+		'z-index': 1000,
+		'box-shadow': '2px 2px 2px #a33'
+	});
+	return frame;
+};
+
+let __createYoutubeSpamCommentsScrollButton = () => {
+	let scrollButton = $('<button">Scroll</button>');
+	scrollButton.css({cursor: 'pointer', float: 'left'});
+	return scrollButton;
+};
+
+let __createYoutubeSpamCommentsScrollOffButton = () => {
+	let scrollOffButton = $('<button">Stop Scrolling</button>');
+	scrollOffButton.css({cursor: 'pointer', float: 'right'});
+	scrollOffButton.hide();
+	return scrollOffButton;
+};
+
+let __createYoutubeSpamCommentsDeleteButton = () => {
+	let deleteButton = $('<button">Spam</button>');
+	deleteButton.css({cursor: 'pointer', float: 'left'});
+	return deleteButton;
+};
+
+let __createYoutubeSpamCommentsStopButton = () => {
+	let deleteOffButton = $('<button">Stop Spamming</button>');
+	deleteOffButton.css({cursor: 'pointer', float: 'right'});
+	deleteOffButton.hide();
+	return deleteOffButton;
+};
+
+class YoutubeSpamComments {
+	constructor() {
+		this.delay = 2000;
+		this.keepScrolling = false;
+		this.keepDeleting = false;
+
+		this.frame = __createYoutubeSpamCommentsFrame();
+
+		let row1 = $('<div"></div>');
+		this.scrollButton = __createYoutubeSpamCommentsScrollButton();
+		this.scrollOffButton = __createYoutubeSpamCommentsScrollOffButton();
+		this.scrollButton.click(this.onScroll.bind(this));
+		this.scrollOffButton.click(this.onStopScroll.bind(this));
+		row1.append(this.scrollButton);
+		row1.append(this.scrollOffButton);
+
+		let row2 = $('<div"></div>');
+		this.deleteButton = __createYoutubeSpamCommentsDeleteButton();
+		this.deleteOffButton = __createYoutubeSpamCommentsStopButton();
+		this.deleteButton.click(this.onDelete.bind(this));
+		this.deleteOffButton.click(this.onStopDeleting.bind(this));
+		row2.append(this.deleteButton);
+		row2.append(this.deleteOffButton);
+
+		this.frame.append(row1);
+		this.frame.append( $('<br/><br/>'));
+		this.frame.append(row2);
+		$('body').append(this.frame);
+
+		this.timeouts = [];
+
+		console.log ("Youtube Spam Comments initiated.");
+		this.scroll();
+	}
+
+	quickScroll() {
+		if (this.keepDeleting) {
+            let main = document.getElementById('main');
+            main.scrollTo(0, main.scrollHeight);
+            setTimeout(() => main.scrollTo(0, main.scrollHeight), 2500);
+            setTimeout(() => main.scrollTo(0, 0), 5000);
+        }
+	}
+
+	continueDeleting() {
+		if (this.keepDeleting) this.deleteAllComments();
+		else this.onStopDeleting();
+	}
+
+	removeComment(pen) {
+		if(!this.keepDeleting) return;
+		pen.click();
+	}
+
+	deleteAllComments() {
+		let pens = document.querySelectorAll('[aria-label="Hide user from channel"]');
+		console.log("Hiding all " + pens.length + " comments users.");
+		let count = 0;
+		_.forEach(pens, (pen) => {
+			this.timeouts.push(setTimeout(() => this.removeComment(pen), (++count) * this.delay));
+		});
+    	this.timeouts.push(setTimeout(() => this.quickScroll(), (count/2) * this.delay));
+		this.timeouts.push(setTimeout(() => this.continueDeleting(), (++count) * this.delay));
+    }
+
+	onScroll() {
+		this.keepDeleting = false;
+		this.keepScrolling = true;
+		this.deleteButton.show();
+		this.deleteOffButton.hide();
+		this.scrollButton.hide();
+		this.scrollOffButton.show();
+	}
+
+	onStopScroll() {
+		this.keepDeleting = false;
+		this.keepScrolling = false;
+		this.deleteButton.show();
+		this.deleteOffButton.hide();
+		this.scrollButton.show();
+		this.scrollOffButton.hide();
+	}
+
+	onDelete() {
+		this.keepDeleting = true;
+		this.keepScrolling = false;
+		this.deleteButton.hide();
+		this.deleteOffButton.show();
+		this.scrollButton.hide();
+		this.scrollOffButton.hide();
+		this.deleteAllComments();
+	}
+
+	onStopDeleting() {
+		this.keepDeleting = false;
+		this.keepScrolling = false;
+		this.deleteButton.show();
+		this.deleteOffButton.hide();
+		this.scrollButton.show();
+		this.scrollOffButton.hide();
+
+		console.log('Stopping deletions.');
+		_.each(this.timeouts, (tmo) => clearTimeout(tmo));
+	}
+
+	scroll() {
+		let main = document.getElementById('main');
+		if(this.keepScrolling) main.scrollTo(0, main.scrollHeight);
+		setTimeout(this.scroll.bind(this), 500);
+	}
+}
+
+new YoutubeSpamComments();
