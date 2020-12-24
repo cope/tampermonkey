@@ -95,18 +95,22 @@ class FBDeleteComments {
         if(!this.keepDeleting) return;
 
         pen.click();
-        let rems = document.getElementsByClassName("_54nc");
-        _.each(rems, (rem) => {
-            let ajaxify = rem.getAttribute('ajaxify');
-            if(
-                _.startsWith(ajaxify, __removeCommentCheck) ||
-                _.startsWith(ajaxify, __removeLikeCheck)
-            ) setTimeout(() => rem.click(), 100);
-        });
+        setTimeout(function () {
+            let del1 = document.getElementsByClassName("hu5pjgll lzf7d6o1 sp_L8hZbX72zYl sx_2a9616")[0];
+            if(del1) del1.click();
+            let lik1 = document.getElementsByClassName("hu5pjgll lzf7d6o1 sp_ZQpsRDH3F49 sx_8d9abc")[0];
+            if(lik1) lik1.click();
+            setTimeout(function () {
+                let del2 = document.querySelectorAll('[aria-label="Премести у отпад"][tabindex="0"]')[0];
+                if(del2) del2.click()
+                let meh2 = document.querySelectorAll('[aria-label="У реду"][tabindex="0"]')[0];
+                if(meh2) meh2.click();
+            }, 250);
+        }, 250);
     }
 
     deleteAllComments() {
-        let pens = document.getElementsByClassName("_42ft _42fu _4-s1 _2agf _4o_4 _p _42gx");
+        let pens = document.getElementsByClassName("hu5pjgll lzf7d6o1 sp_0x6NxesaAWH sx_02ba65");
         console.log("Deleting all " + pens.length + " comments.");
         let count = 0;
         _.forEachRight(pens, (pen) => {
@@ -156,7 +160,10 @@ class FBDeleteComments {
     }
 
     scroll() {
-        if(this.keepScrolling) window.scrollTo(0, document.body.scrollHeight);
+        if(this.keepScrolling) {
+            var side = document.getElementsByClassName("q5bimw55 rpm2j7zs k7i0oixp gvuykj2m j83agx80 cbu4d94t ni8dbmo4 eg9m0zos l9j0dhe7 du4w35lb ofs802cu pohlnb88 dkue75c7 mb9wzai9 d8ncny3e buofh1pr g5gj957u tgvbjcpo l56l04vs r57mb794 kh7kg01d c3g1iek1 k4xni2cv")[0];
+            side.scrollTo(0, side.scrollHeight);
+        }
         setTimeout(this.scroll.bind(this), 500);
     }
 }
